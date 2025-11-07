@@ -9,7 +9,7 @@ export const createFeedbackSchema = {
   [Segments.BODY]: Joi.object({
     author: Joi.string().min(2).max(53).required(),
     date: Joi.date().required(),
-    description: Joi.string().max(500).default(''),
+    description: Joi.string().max(500).required(),
     rate: Joi.number()
       .min(1)
       .max(5)
