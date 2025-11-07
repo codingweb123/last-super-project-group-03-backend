@@ -13,9 +13,8 @@ const feedbackSchema = new Schema(
     },
     description: {
       type: String,
-      default: '',
       trim: true,
-      required: false,
+      required: true,
     },
     rate: {
       type: Number,
