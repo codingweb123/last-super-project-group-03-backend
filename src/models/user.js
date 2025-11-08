@@ -1,5 +1,4 @@
 import { model, Schema } from 'mongoose';
-import { ROLE } from '../constants/role.js';
 
 const userSchema = new Schema(
   {
@@ -10,24 +9,34 @@ const userSchema = new Schema(
     },
     lastName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     phone: {
       type: Number,
       required: true,
+      // unique: true,
     },
-    city: { type: String, required: true },
-    postOfficeNumber: { type: String, required: true, default: '1' },
-    role: { type: String, enum: ROLE, default: 'buyer' },
+    city: { type: String, required: false },
+    postalOffice: { type: String, required: false, default: '1' },
     avatar: {
       type: String,
       required: false,
       default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
-    theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+    avatar_id: { type: String },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    password: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true, versionKey: false },
 );
 
+userSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 export const User = model('User', userSchema);

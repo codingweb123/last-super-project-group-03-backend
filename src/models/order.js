@@ -1,25 +1,50 @@
 import { model, Schema } from 'mongoose';
 
-const orderItemSchema = new Schema({
-  product: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
-  quantity: { type: Number, required: true, default: 1 },
-});
-
 const orderSchema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    orderItems: [orderItemSchema],
-    subTotal: { type: Number, required: true },
-    shippingPrice: { type: Number, default: 0 },
-    totalPrice: { type: Number, required: true },
-    comment: { type: String, required: false },
-    status: {
-      type: String,
-      enum: ['У процесі', 'Комплектується', 'Виконано', 'Скасовано'],
+    products: [
+      {
+        id: { type: String },
+        amount: { type: Number, required: true, default: 1 },
+        size: { type: String, required: true, default: 'XXS' },
+        color: { type: String, required: true, default: 'white' },
+      },
+    ],
+    sum: { type: Number, required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
     },
-    orderNumber: {
+    date: { type: String },
+    orderNum: {
       type: String,
       unique: true,
+    },
+    comment: { type: String, required: false, default: '' },
+    status: {
+      type: String,
+      enum: ['Processing', 'Packing', 'Completed', 'Cancelled'],
+      default: 'Processing',
+    },
+    userData: {
+      firstName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      phone: {
+        type: Number,
+        required: true,
+        unique: true,
+      },
+      city: { type: String, required: true, default: '' },
+      postalOffice: { type: String, required: false, default: '1' },
     },
   },
   { timestamps: true, versionKey: false },
@@ -27,8 +52,8 @@ const orderSchema = new Schema(
 
 orderSchema.pre('save', async function (next) {
   if (this.isNew) {
-    const lastOrder = await this.constructor.findOne().sort('-orderNumber');
-    this.orderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1000001;
+    const lastOrder = await this.constructor.findOne().sort('-orderNum');
+    this.orderNum = lastOrder ? lastOrder.orderNum + 1 : 1000001;
   }
   next();
 });
