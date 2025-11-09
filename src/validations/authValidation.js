@@ -16,14 +16,14 @@ export const requestResetEmailSchema = {
 export const registerUserSchema = {
   [Segments.BODY]: Joi.object({
     name: Joi.string().max(32).required(),
-    email: Joi.string().email().max(64).required(),
+    phone: Joi.string().pattern(/^\+[0-9]{10,15}$/).required(),
     password: Joi.string().min(8).max(128).required(),
   }),
 };
 
 export const loginUserSchema = {
   [Segments.BODY]: Joi.object({
-    email: Joi.string().email().max(64).required(),
+    phone: Joi.string().pattern(/^\+[0-9]{10,15}$/).required(),
     password: Joi.string().min(8).max(128).required(),
   }),
-}
+};
