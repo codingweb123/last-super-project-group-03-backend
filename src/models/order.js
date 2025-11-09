@@ -4,47 +4,47 @@ const orderSchema = new Schema(
   {
     products: [
       {
-        id: { type: String },
-        amount: { type: Number, required: true, default: 1 },
-        size: { type: String, required: true, default: 'XXS' },
-        color: { type: String, required: true, default: 'white' },
+        _id: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
+        amount: { type: Number, required: true, min: 1 },
+        size: { type: String, required: true },
+        color: { type: String, required: true },
       },
     ],
     sum: { type: Number, required: true },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: false,
+      default: null,
     },
-    date: { type: String },
+    userPhone: {
+      type: Number,
+      required: true,
+    },
+    date: { type: String, required: true },
     orderNum: {
       type: String,
       unique: true,
     },
-    comment: { type: String, required: false, default: '' },
+    comment: { type: String, default: '' },
     status: {
       type: String,
-      enum: ['Processing', 'Packing', 'Completed', 'Cancelled'],
-      default: 'Processing',
+      enum: ['processing', 'packing', 'completed', 'cancelled'],
+      default: 'processing',
     },
     userData: {
       firstName: {
         type: String,
-        required: true,
         trim: true,
       },
       lastName: {
         type: String,
-        required: true,
         trim: true,
       },
       phone: {
         type: Number,
-        required: true,
-        unique: true,
       },
-      city: { type: String, required: true, default: '' },
-      postalOffice: { type: String, required: false, default: '1' },
+      city: { type: String, required: true },
+      postalOffice: { type: Number, required: true },
     },
   },
   { timestamps: true, versionKey: false },
@@ -53,7 +53,7 @@ const orderSchema = new Schema(
 orderSchema.pre('save', async function (next) {
   if (this.isNew) {
     const lastOrder = await this.constructor.findOne().sort('-orderNum');
-    this.orderNum = lastOrder ? lastOrder.orderNum + 1 : 1000001;
+    this.orderNum = lastOrder ? lastOrder.orderNum + 1 : 1235960;
   }
   next();
 });

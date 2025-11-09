@@ -3,6 +3,7 @@ import { celebrate } from 'celebrate';
 import { authenticate } from '../middleware/authenticate.js';
 import {
   createOrderSchema,
+  getUserOrdersSchema,
   updateOrderStatusSchema,
 } from '../validations/orderValidation.js';
 import {
@@ -14,7 +15,12 @@ import {
 const router = Router();
 
 router.post('/orders', celebrate(createOrderSchema), createOrder);
-router.get('/orders', authenticate, getUserOrders);
+router.get(
+  '/orders',
+  authenticate,
+  celebrate(getUserOrdersSchema),
+  getUserOrders,
+);
 router.patch(
   '/orders/:orderId',
   authenticate,

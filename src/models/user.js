@@ -15,7 +15,7 @@ const userSchema = new Schema(
     phone: {
       type: Number,
       required: true,
-      // unique: true,
+      unique: true,
     },
     city: { type: String, required: false },
     postalOffice: { type: String, required: false, default: '1' },
@@ -24,7 +24,7 @@ const userSchema = new Schema(
       required: false,
       default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
-    avatar_id: { type: String },
+    avatar_id: { type: String, default: '' },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     password: {
       type: String,

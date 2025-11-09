@@ -6,12 +6,18 @@ export const objectIdValidator = (value, helpers) => {
   return !isValidObjectId(value) ? helpers.message('Invalid id format') : value;
 };
 
+export const getUserOrdersSchema = {
+  [Segments.PARAMS]: Joi.object({
+    userId: Joi.string().custom(objectIdValidator).required(),
+  }),
+};
+
 export const createOrderSchema = {
   [Segments.BODY]: Joi.object({
     products: Joi.array()
       .items(
         Joi.object({
-          id: Joi.string().required(),
+          _id: Joi.string().required(),
           amount: Joi.number().integer().min(1).default(1),
           size: Joi.string()
             .valid('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL')
@@ -32,8 +38,8 @@ export const updateOrderStatusSchema = {
   }),
   [Segments.BODY]: Joi.object({
     status: Joi.string()
-      .valid('Processing', 'Packing', 'Completed', 'Cancelled')
-      .default('Processing')
+      .valid('processing', 'packing', 'completed', 'cancelled')
+      .default('processing')
       .required(),
   }),
 };

@@ -9,6 +9,8 @@ import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errors } from 'celebrate';
 import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
+import categoriesRoutes from './routes/categoriesRoutes.js';
+import feedbacksRoutes from './routes/feedbacksRoutes.js';
 import goodsRoutes from './routes/goodsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
@@ -30,6 +32,8 @@ app.use(cookieParser());
 app.use(myCookieParser);
 
 app.use(authRoutes);
+app.use(categoriesRoutes);
+app.use(feedbacksRoutes);
 app.use(goodsRoutes);
 app.use(userRoutes);
 app.use(orderRoutes);
