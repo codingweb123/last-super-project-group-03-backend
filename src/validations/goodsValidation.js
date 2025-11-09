@@ -9,7 +9,7 @@ export const getAllGoodsSchema = {
   [Segments.QUERY]: Joi.object({
     category: Joi.string().custom(objectIdValidator),
     sizes: Joi.string().pattern(
-      /(?<=^)(XXS|XS|S|M|L|XL|XXL)((,(XXS|XS|S|M|L|XL|XXL))+)?(?=$)/,
+      /^(XXS|XS|S|M|L|XL|XXL)((,(XXS|XS|S|M|L|XL|XXL))+)?$/,
     ),
     fromPrice: Joi.number().integer().min(1).max(19999),
     toPrice: Joi.number().integer().min(2).max(20000),
