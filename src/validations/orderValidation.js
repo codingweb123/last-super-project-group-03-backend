@@ -7,8 +7,10 @@ export const objectIdValidator = (value, helpers) => {
 };
 
 export const getUserOrdersSchema = {
-  [Segments.PARAMS]: Joi.object({
-    userId: Joi.string().custom(objectIdValidator).required(),
+  [Segments.QUERY]: Joi.object({
+    status: Joi.string()
+      .valid('processing', 'packing', 'completed', 'cancelled')
+      .required(),
   }),
 };
 
@@ -17,18 +19,20 @@ export const createOrderSchema = {
     products: Joi.array()
       .items(
         Joi.object({
-          _id: Joi.string().required(),
+          _id: Joi.string().custom(objectIdValidator).required(),
           amount: Joi.number().integer().min(1).default(1),
           size: Joi.string()
             .valid('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL')
             .required(),
-          color: Joi.string().required(),
+          color: Joi.string()
+            .valid('white', 'black', 'grey', 'blue', 'green', 'red', 'pastel')
+            .required(),
         }),
       )
       .min(1)
       .required(),
     comment: Joi.string().allow('').default(''),
-    userData: userDataSchema.optional(),
+    userData: userDataSchema.required(),
   }),
 };
 
@@ -39,7 +43,6 @@ export const updateOrderStatusSchema = {
   [Segments.BODY]: Joi.object({
     status: Joi.string()
       .valid('processing', 'packing', 'completed', 'cancelled')
-      .default('processing')
-      .required(),
+      .default('processing'),
   }),
 };

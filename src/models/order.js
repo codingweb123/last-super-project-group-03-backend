@@ -6,19 +6,23 @@ const orderSchema = new Schema(
       {
         _id: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
         amount: { type: Number, required: true, min: 1 },
-        size: { type: String, required: true },
-        color: { type: String, required: true },
+        size: {
+          type: String,
+          required: true,
+          enum: ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL'],
+        },
+        color: {
+          type: String,
+          required: true,
+          enum: ['white', 'black', 'grey', 'blue', 'green', 'red', 'pastel'],
+        },
       },
     ],
     sum: { type: Number, required: true },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      default: null,
-    },
-    userPhone: {
-      type: Number,
-      required: true,
+      required: false,
     },
     date: { type: String, required: true },
     orderNum: {
@@ -34,14 +38,17 @@ const orderSchema = new Schema(
     userData: {
       firstName: {
         type: String,
+        required: true,
         trim: true,
       },
       lastName: {
         type: String,
+        required: true,
         trim: true,
       },
       phone: {
-        type: Number,
+        type: String,
+        required: true,
       },
       city: { type: String, required: true },
       postalOffice: { type: Number, required: true },
@@ -49,13 +56,5 @@ const orderSchema = new Schema(
   },
   { timestamps: true, versionKey: false },
 );
-
-orderSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    const lastOrder = await this.constructor.findOne().sort('-orderNum');
-    this.orderNum = lastOrder ? lastOrder.orderNum + 1 : 1235960;
-  }
-  next();
-});
 
 export const Order = model('Order', orderSchema);

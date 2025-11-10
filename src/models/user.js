@@ -9,16 +9,16 @@ const userSchema = new Schema(
     },
     lastName: {
       type: String,
-      required: false,
+      required: true,
       trim: true,
     },
     phone: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },
-    city: { type: String, required: false },
-    postalOffice: { type: String, required: false, default: '1' },
+    city: { type: String, required: true },
+    postalOffice: { type: String, required: true, default: '1' },
     avatar: {
       type: String,
       required: false,
