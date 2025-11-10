@@ -58,7 +58,7 @@ export const requestResetEmail = async (req, res) => {
   const templateSource = await fs.readFile(templatePath, 'utf-8');
   const template = handlebars.compile(templateSource);
   const html = template({
-    name: user.name,
+    name: user.firstName,
     link: `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`,
   });
 
@@ -79,7 +79,7 @@ export const requestResetEmail = async (req, res) => {
 };
 
 export const registerUser = async (req, res) => {
-  const { name, phone, password } = req.body;
+  const { firstName, phone, password } = req.body;
 
   const existingUser = await User.findOne({ phone });
   if (existingUser) {
@@ -89,7 +89,7 @@ export const registerUser = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({
-    name,
+    firstName,
     phone,
     password: hashedPassword,
   });
