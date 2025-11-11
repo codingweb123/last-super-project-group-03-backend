@@ -26,11 +26,13 @@ const userSchema = new Schema(
       default: 1,
     },
     avatar: {
-      type: String,
-    },
-    avatar_id: {
-      type: String,
-    },
+			type: String,
+			default: "https://ac.goit.global/fullstack/react/default-avatar.jpg",
+		},
+		avatar_id: {
+			type: String,
+			default: "",
+		},
     role: {
       type: String,
       enum: ["user", "admin"],
