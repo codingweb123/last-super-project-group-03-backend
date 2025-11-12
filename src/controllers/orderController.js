@@ -3,14 +3,14 @@ import { Order } from '../models/order.js';
 import { Good } from '../models/good.js';
 
 export const createOrder = async (req, res) => {
-  const { products, comment, userData, userId } = req.body;
+  const { products, comment, userData } = req.body;
 
   const getRandomNum = (min, max) => {
     return Math.round(Math.random() * (max - min) + min);
   };
   const orderNum = getRandomNum(1111111, 9999999);
 
-  const goods = await Promise.all(products.map((p) => Good.findById(p._id)));
+  const goods = await Promise.all(products.map((p) => Good.findById(p.id)));
 
   let sum = goods.reduce((acc, good, i) => {
     if (!good) return acc;
@@ -18,13 +18,19 @@ export const createOrder = async (req, res) => {
   }, 0);
 
   const order = await Order.create({
-    products,
+    products: products.map((p) => ({
+      _id: p.id,
+      amount: p.amount,
+      size: p.size,
+      color: p.color,
+    })),
     date: new Date().toISOString().split('T')[0],
     orderNum,
     sum,
     comment,
     userData,
-    ...(userId && { userId }),
+    ...(req.user?._id && { userId: req.user._id }),
+    // ...(userId && { userId }),
   });
 
   return res.status(201).json({
@@ -42,7 +48,7 @@ export const createOrder = async (req, res) => {
 
 export const getUserOrders = async (req, res) => {
   const orders = await Order.find({
-    $or: [{ userId: req.user._id }, { 'userData.phone': req.user.phone }],
+    $or: [{ userId: req.user.id }, { 'userData.phone': req.user.phone }],
   }).sort({ date: -1 });
 
   const userOrdersRes = orders.map((order) => ({

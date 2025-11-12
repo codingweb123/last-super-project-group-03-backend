@@ -19,7 +19,7 @@ export const createOrderSchema = {
     products: Joi.array()
       .items(
         Joi.object({
-          _id: Joi.string().custom(objectIdValidator).required(),
+          id: Joi.string().custom(objectIdValidator).required(),
           amount: Joi.number().integer().min(1).default(1),
           size: Joi.string()
             .valid('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL')
