@@ -31,6 +31,7 @@ export const createOrderSchema = {
       )
       .min(1)
       .required(),
+    userId: Joi.string().custom(objectIdValidator),
     comment: Joi.string().allow('').default(''),
     userData: userDataSchema.required(),
   }),

@@ -4,7 +4,7 @@ const orderSchema = new Schema(
   {
     products: [
       {
-        _id: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
+        id: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
         amount: { type: Number, required: true, min: 1 },
         size: {
           type: String,
@@ -17,6 +17,7 @@ const orderSchema = new Schema(
           enum: ['white', 'black', 'grey', 'blue', 'green', 'red', 'pastel'],
         },
       },
+      { _id: false },
     ],
     sum: { type: Number, required: true },
     userId: {

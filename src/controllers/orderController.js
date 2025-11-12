@@ -4,6 +4,7 @@ import { Good } from '../models/good.js';
 
 export const createOrder = async (req, res) => {
   const { products, comment, userData } = req.body;
+  const userId = req.user?._id;
 
   const getRandomNum = (min, max) => {
     return Math.round(Math.random() * (max - min) + min);
@@ -18,52 +19,22 @@ export const createOrder = async (req, res) => {
   }, 0);
 
   const order = await Order.create({
-    products: products.map((p) => ({
-      _id: p.id,
-      amount: p.amount,
-      size: p.size,
-      color: p.color,
-    })),
+    products,
     date: new Date().toISOString().split('T')[0],
     orderNum,
     sum,
     comment,
     userData,
-    ...(req.user?._id && { userId: req.user._id }),
-    // ...(userId && { userId }),
+    ...(userId && { userId }),
   });
-
-  return res.status(201).json({
-    _id: order._id,
-    products: order.products,
-    sum: order.sum,
-    userId: order.userId,
-    date: order.date,
-    orderNum: order.orderNum,
-    comment: order.comment,
-    status: order.status,
-    userData: order.userData,
-  });
+  return res.status(201).json(order);
 };
 
 export const getUserOrders = async (req, res) => {
   const orders = await Order.find({
-    $or: [{ userId: req.user.id }, { 'userData.phone': req.user.phone }],
+    $or: [{ userId: req.user._id }, { 'userData.phone': req.user.phone }],
   }).sort({ date: -1 });
-
-  const userOrdersRes = orders.map((order) => ({
-    _id: order._id,
-    products: order.products,
-    sum: order.sum,
-    userId: order.userId,
-    date: order.date,
-    orderNum: order.orderNum,
-    comment: order.comment,
-    status: order.status,
-    userData: order.userData,
-  }));
-
-  res.status(200).json(userOrdersRes);
+  res.status(200).json(orders);
 };
 
 export const updateOrderStatus = async (req, res) => {
@@ -80,15 +51,5 @@ export const updateOrderStatus = async (req, res) => {
     { new: true },
   );
 
-  return res.status(200).json({
-    _id: updated._id,
-    products: updated.products,
-    sum: updated.sum,
-    userId: updated.userId,
-    date: updated.date,
-    orderNum: updated.orderNum,
-    comment: updated.comment,
-    status: updated.status,
-    userData: updated.userData,
-  });
+  return res.status(200).json(updated);
 };
