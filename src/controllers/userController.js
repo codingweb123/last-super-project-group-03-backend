@@ -1,8 +1,9 @@
-import { User } from '../models/user.js';
+import { User } from "../models/user.js"
 
 export const updateUserProfile = async (req, res) => {
-  const user = await User.findOneAndUpdate({ _id: req.user._id }, req.body, {
-    new: true,
-  });
-  res.status(200).json(user);
-};
+	res.status(200).json(
+		await User.findByIdAndUpdate(req.user._id, req.body, {
+			new: true,
+		})
+	)
+}

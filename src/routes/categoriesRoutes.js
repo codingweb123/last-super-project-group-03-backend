@@ -1,12 +1,12 @@
-import { Router } from 'express';
-import { celebrate } from 'celebrate';
+import { Router } from "express"
+import { celebrate } from "celebrate"
 
-import { getAllCategories } from '../controllers/categoriesController.js';
+import { getAllCategories } from "../controllers/categoriesController.js"
 
-import { getAllCategoriesSchema } from '../validations/categoriesValidation.js';
+import { getAllCategoriesSchema } from "../validations/categoriesValidation.js"
 
-const router = Router();
+const router = Router()
 
-router.get('/categories', celebrate(getAllCategoriesSchema), getAllCategories);
+router.get("/categories", celebrate(getAllCategoriesSchema), getAllCategories)
 
-export default router;
+export default router

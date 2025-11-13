@@ -1,55 +1,82 @@
-import createHttpError from 'http-errors';
+import createHttpError from "http-errors"
 
-import { Good } from '../models/good.js';
+import { Good } from "../models/good.js"
 
 export async function getAllGoods(req, res) {
-  const {
-    category,
-    sizes,
-    fromPrice = 1,
-    toPrice = 20000,
-    color,
-    gender,
-    page = 1,
-    perPage = 12,
-  } = req.query;
+	const {
+		page = 1,
+		perPage = 8,
+		category,
+		search,
+		gender,
+		price,
+		color,
+		sizes,
+	} = req.query
+	const skip = (page - 1) * perPage
 
-  const skip = (page - 1) * perPage;
+	const goodQuery = Good.find()
 
-  const goodsQuery = Good.find()
-    .populate('feedbacks')
-    .where('price.value')
-    .gte(fromPrice)
-    .lte(toPrice);
+	if (gender) {
+		goodQuery.where("gender").equals(gender)
+	}
 
-  if (category) goodsQuery.where('category').equals(category);
-  if (sizes) goodsQuery.where('sizes').in(sizes.split(','));
-  if (color) goodsQuery.where('colors').in(color);
-  if (gender) goodsQuery.where('gender').equals(gender);
+	if (color) {
+		goodQuery.in("colors", color)
+	}
 
-  const [totalGoods, goods] = await Promise.all([
-    goodsQuery.clone().countDocuments(),
-    goodsQuery.skip(skip).limit(perPage),
-  ]);
+	if (sizes) {
+		goodQuery.in("sizes", sizes.split(","))
+	}
 
-  const totalPages = Math.ceil(totalGoods / perPage);
+	if (price) {
+		const priceFrom = price.split(",")[0]
+		const priceTo = price.split(",")[1]
+		if (priceFrom > 19999 || priceFrom < 0) {
+			throw createHttpError(
+				400,
+				"price from must be not less than 0 or larger than 19999"
+			)
+		}
+		if (priceTo > 20000 || priceFrom < 1) {
+			throw createHttpError(
+				400,
+				"price to must be not less than 1 or larger than 20000"
+			)
+		}
+		goodQuery.where("price.value").gte(priceFrom).lte(priceTo)
+	}
 
-  res.status(200).json({
-    page,
-    perPage,
-    totalGoods,
-    totalPages,
-    goods,
-  });
+	if (search) {
+		goodQuery.where({ $text: { $search: search } })
+	}
+
+	if (category) {
+		goodQuery.where("category").equals(category)
+	}
+
+	const [totalGoods, goods] = await Promise.all([
+		goodQuery.clone().countDocuments(),
+		goodQuery.skip(skip).limit(perPage),
+	])
+
+	const totalPages = Math.ceil(totalGoods / perPage)
+	res.status(200).json({
+		page,
+		perPage,
+		totalGoods,
+		totalPages,
+		goods,
+	})
 }
 
 export async function getGoodById(req, res, next) {
-  const good = await Good.findById(req.params.goodId);
-  // Checks if there's no good.
-  if (!good) {
-    next(createHttpError(404, 'Good not found'));
-    return;
-  }
+	const good = await Good.findById(req.params.goodId)
+	// Checks if there's no good.
+	if (!good) {
+		next(createHttpError(404, "Good not found"))
+		return
+	}
 
-  res.status(200).json(good);
+	res.status(200).json(good)
 }

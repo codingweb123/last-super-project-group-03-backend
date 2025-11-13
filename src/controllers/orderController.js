@@ -1,96 +1,88 @@
-import createHttpError from 'http-errors';
-import { Order } from '../models/order.js';
-import { Good } from '../models/good.js';
+import createHttpError from "http-errors"
+import { Order } from "../models/order.js"
+import { Good } from "../models/good.js"
 
-const getRandomNum = (min, max) => {
-  return Math.round(Math.random() * (max - min) + min);
-};
+const getRandomNumber = (min, max) => {
+	return Math.round(Math.random() * (max - min) + min)
+}
+
+const getOrderSumAndNumber = async products => {
+	const ids = products.map(product => product.id)
+	const goods = await Good.find().in("_id", ids)
+	goods.forEach(good => (ids[good._id] = good))
+	return [
+		Math.ceil(
+			products.reduce((acc, product) => {
+				if (ids[product.id]) acc += product.amount * ids[product.id].price.value
+				return acc
+			})
+		),
+		getRandomNumber(1111111, 9999999),
+	]
+}
+
 export const createOrder = async (req, res) => {
-  const { products, comment, userData } = req.body;
+	const { products, comment, userData } = req.body
 
-  const orderNum = getRandomNum(1111111, 9999999);
-  const date = new Date().toISOString().split('T')[0];
-  const ids = products.map((product) => product.id);
-  const goods = await Good.find({ _id: { $in: ids } });
-  const goodsMap = {};
-  goods.forEach((good) => {
-    goodsMap[good._id] = good;
-  });
+	const date = new Date().toISOString().split("T")[0]
+	const [sum, orderNum] = getOrderSumAndNumber()
 
-  const sum = products.reduce((acc, product) => {
-    const good = goodsMap[product.id];
-    if (good) {
-      acc += product.amount * good.price.value;
-    }
-    return acc;
-  }, 0);
+	const order = await Order.create({
+		products,
+		sum,
+		date,
+		orderNum,
+		comment,
+		userData,
+	})
 
-  const order = await Order.create({
-    products,
-    date,
-    orderNum,
-    sum: Math.ceil(sum),
-    comment,
-    userData,
-  });
-  return res.status(201).json(order);
-};
+	res.status(201).json(order)
+}
 
 export const createOrderByUser = async (req, res) => {
-  const { products, comment, userData } = req.body;
+	const { products, comment, userData } = req.body
 
-  const orderNum = getRandomNum(1111111, 9999999);
-  const date = new Date().toISOString().split('T')[0];
+	const date = new Date().toISOString().split("T")[0]
+	const [sum, orderNum] = getOrderSumAndNumber()
 
-  const ids = products.map((product) => product.id);
-  const goods = await Good.find({ _id: { $in: ids } });
-  const goodsMap = {};
-  goods.forEach((good) => {
-    goodsMap[good._id] = good;
-  });
+	const order = await Order.create({
+		products,
+		sum,
+		userId: req.user._id,
+		date,
+		orderNum,
+		comment,
+		userData,
+	})
 
-  const sum = products.reduce((acc, product) => {
-    const good = goodsMap[product.id];
-    if (good) {
-      acc += product.amount * good.price.value;
-    }
-    return acc;
-  }, 0);
-  const order = await Order.create({
-    products,
-    date,
-    userId: req.user._id,
-    orderNum,
-    sum: Math.ceil(sum),
-    comment,
-    userData,
-  });
-  return res.status(201).json(order);
-};
+	res.status(201).json(order)
+}
 
 export const getUserOrders = async (req, res) => {
-  const userId = req.user._id;
-
-  const orders = await Order.find({
-    $or: [{ userId }, { 'userData.userId': String(userId) }],
-  }).sort({ date: -1 });
-
-  res.status(200).json(orders);
-};
+	res.status(200).json(
+		await Order.find({
+			$or: [{ _id: req.user._id }, { "userData.phone": req.user.phone }],
+		})
+	)
+}
 
 export const updateOrderStatus = async (req, res) => {
-  const { orderId } = req.params;
-  const { status } = req.body;
+	const { orderId } = req.params
+	const { status } = req.body
 
-  if (req.user.role !== 'admin') {
-    throw createHttpError(403, 'You are not allowed to change order status');
-  }
+	if (req.user.role !== "admin") {
+		throw createHttpError(403, "Access restricted")
+	}
 
-  const updated = await Order.findByIdAndUpdate(
-    orderId,
-    { status },
-    { new: true },
-  );
+	const updated = await Order.findByIdAndUpdate(
+		orderId,
+		{ status },
+		{ new: true }
+	)
 
-  return res.status(200).json(updated);
-};
+	if (!updated) {
+		throw createHttpError(404, "Order not found")
+	}
+
+	return res.status(200).json(updated)
+}

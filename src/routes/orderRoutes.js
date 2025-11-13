@@ -1,38 +1,32 @@
-import { Router } from 'express';
-import { celebrate } from 'celebrate';
-import { authenticate } from '../middleware/authenticate.js';
+import { Router } from "express"
+import { celebrate } from "celebrate"
+import { authenticate } from "../middleware/authenticate.js"
 import {
-  createOrderSchema,
-  getUserOrdersSchema,
-  updateOrderStatusSchema,
-} from '../validations/orderValidation.js';
+	createOrderSchema,
+	updateOrderStatusSchema,
+} from "../validations/orderValidation.js"
 import {
-  createOrder,
-  createOrderByUser,
-  getUserOrders,
-  updateOrderStatus,
-} from '../controllers/orderController.js';
+	createOrder,
+	createOrderByUser,
+	getUserOrders,
+	updateOrderStatus,
+} from "../controllers/orderController.js"
 
-const router = Router();
+const router = Router()
 
-router.post('/orders', celebrate(createOrderSchema), createOrder);
+router.get("/orders", authenticate, getUserOrders)
+router.post("/orders", celebrate(createOrderSchema), createOrder)
 router.post(
-  '/orders/user',
-  authenticate,
-  celebrate(createOrderSchema),
-  createOrderByUser,
-);
-router.get(
-  '/orders',
-  authenticate,
-  celebrate(getUserOrdersSchema),
-  getUserOrders,
-);
+	"/orders/user",
+	authenticate,
+	celebrate(createOrderSchema),
+	createOrderByUser
+)
 router.patch(
-  '/orders/:orderId',
-  authenticate,
-  celebrate(updateOrderStatusSchema),
-  updateOrderStatus,
-);
+	"/orders/:orderId",
+	authenticate,
+	celebrate(updateOrderStatusSchema),
+	updateOrderStatus
+)
 
-export default router;
+export default router

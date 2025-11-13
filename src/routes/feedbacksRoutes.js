@@ -1,16 +1,16 @@
-import { Router } from 'express';
-import { celebrate } from 'celebrate';
+import { Router } from "express"
+import { celebrate } from "celebrate"
 
 import {
-  createFeedback,
-  getFeedbacks,
-} from '../controllers/feedbacksController.js';
+	createFeedback,
+	getFeedbacks,
+} from "../controllers/feedbacksController.js"
 
-import { createFeedbackSchema } from '../validations/feedbacksValidation.js';
+import { createFeedbackSchema } from "../validations/feedbacksValidation.js"
 
-const router = Router();
+const router = Router()
 
-router.post('/feedbacks', celebrate(createFeedbackSchema), createFeedback);
-router.get('/feedbacks', getFeedbacks);
+router.post("/feedbacks", celebrate(createFeedbackSchema), createFeedback)
+router.get("/feedbacks", getFeedbacks)
 
-export default router;
+export default router

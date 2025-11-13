@@ -1,16 +1,16 @@
-import { Router } from 'express';
-import { celebrate } from 'celebrate';
+import { Router } from "express"
+import { celebrate } from "celebrate"
 
-import { getAllGoods, getGoodById } from '../controllers/goodsController.js';
+import { getAllGoods, getGoodById } from "../controllers/goodsController.js"
 
 import {
-  getAllGoodsSchema,
-  goodIdSchema,
-} from '../validations/goodsValidation.js';
+	getAllGoodsSchema,
+	goodIdSchema,
+} from "../validations/goodsValidation.js"
 
-const router = Router();
+const router = Router()
 
-router.get('/goods', celebrate(getAllGoodsSchema), getAllGoods);
-router.get('/goods/:goodId', celebrate(goodIdSchema), getGoodById);
+router.get("/goods", celebrate(getAllGoodsSchema), getAllGoods)
+router.get("/goods/:goodId", celebrate(goodIdSchema), getGoodById)
 
-export default router;
+export default router
