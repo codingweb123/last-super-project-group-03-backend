@@ -8,6 +8,7 @@ import {
 } from '../validations/orderValidation.js';
 import {
   createOrder,
+  createOrderByUser,
   getUserOrders,
   updateOrderStatus,
 } from '../controllers/orderController.js';
@@ -15,6 +16,12 @@ import {
 const router = Router();
 
 router.post('/orders', celebrate(createOrderSchema), createOrder);
+router.post(
+  '/orders/user',
+  authenticate,
+  celebrate(createOrderSchema),
+  createOrderByUser,
+);
 router.get(
   '/orders',
   authenticate,
